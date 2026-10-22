@@ -17,7 +17,7 @@ export class FixedTimestep {
    * Returns how many simulation steps to run this frame.
    */
   advance(_frameMs: number): number {
-    throw new Error("TODO: implement FixedTimestep.advance");
+       if (stepMs > maxFrameMs)
   }
 
   /**
@@ -25,6 +25,6 @@ export class FixedTimestep {
    * The renderer uses it to interpolate between the previous and current state.
    */
   get alpha(): number {
-    throw new Error("TODO: implement FixedTimestep.alpha");
+            return   this.accumulator / this.stepMs
   }
 }
