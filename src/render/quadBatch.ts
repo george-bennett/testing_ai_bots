@@ -36,6 +36,15 @@ export function writeQuad(
  * Fill `indices` with the index pattern for `quadCount` quads (6 indices each).
  * Indices count vertices, not floats.
  */
-export function fillQuadIndices(_indices: Uint16Array, _quadCount: number): void {
-  throw new Error("TODO: implement fillQuadIndices");
+export function fillQuadIndices(indices: Uint16Array, quadCount: number): void {
+for (let quad = 0; quad < quadCount; quad++) {
+  const firstIndex = quad * 6 ;   // where this quad's 6 indices start in `indices`
+  const firstVertex = quad * 4 ;  // the "4i" from your formula
+  indices[firstIndex + 0] = firstVertex + 0;
+  indices[firstIndex + 1] = firstVertex + 1;
+  indices[firstIndex + 2] = firstVertex + 2;
+  indices[firstIndex + 3] = firstVertex + 2;
+  indices[firstIndex + 4] = firstVertex + 3;
+  indices[firstIndex + 5] = firstVertex + 0;// ...five more lines, using your pattern: 0, 1, 2, 2, 3, 0
+}
 }
