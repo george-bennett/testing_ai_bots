@@ -18,6 +18,32 @@ void main() {
 }
 `;
 
+export const SPRITE_VERTEX_SHADER = `
+attribute vec2 a_pixel_position;
+attribute vec2 a_uv;
+uniform vec2 u_canvas_size;
+varying vec2 v_uv;
+
+void main() {
+    // Same pixel -> clip space conversion as the rect shader.
+    vec2 zero_to_two = (a_pixel_position / u_canvas_size) * 2.0;
+    vec2 clip_space = vec2(zero_to_two.x - 1.0, 1.0 - zero_to_two.y);
+
+    gl_Position = vec4(clip_space, 0.0, 1.0);
+    v_uv = a_uv; // interpolated across the triangle for the fragment shader
+}
+`;
+
+export const SPRITE_FRAGMENT_SHADER = `
+precision mediump float;
+uniform sampler2D u_texture;
+varying vec2 v_uv;
+
+void main() {
+    gl_FragColor = texture2D(u_texture, v_uv);
+}
+`;
+
 export const RECT_FRAGMENT_SHADER = `
 precision mediump float;
 uniform vec4 u_color;
