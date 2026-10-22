@@ -19,6 +19,15 @@ export interface Size {
  * If the world is smaller than the view on an axis, the camera sits at 0 on that axis.
  * Each axis is independent.
  */
-export function cameraFor(_target: Vec2, _view: Size, _world: Size): Vec2 {
-  throw new Error("TODO: implement cameraFor");
+function axis(target: number, view: number, world: number): number {
+  const centred = target - view / 2;   // step 1: target minus half the view (assembled from "300 - 90")
+  const max = Math.max(0, world - view);       // furthest the camera's edge may go
+  return Math.min(Math.max(centred, 0), max);
+}
+
+export function cameraFor(target: Vec2, view: Size, world: Size): Vec2 {
+  return {
+    x: axis(target.x, view.w, world.w),
+    y: axis(target.y, view.h, world.h),
+  };
 }
