@@ -29,7 +29,31 @@ export function writeQuad(
   _u1: number,
   _v1: number,
 ): void {
-  throw new Error("TODO: implement writeQuad");
+  const offset = _quadIndex * 16;
+
+  // Vertex 0: Top-Left
+  _vertices[offset + 0]  = _x;
+  _vertices[offset + 1]  = _y;
+  _vertices[offset + 2]  = _u0;
+  _vertices[offset + 3]  = _v0;
+
+  // Vertex 1: Top-Right
+  _vertices[offset + 4]  = _x + _w;
+  _vertices[offset + 5]  = _y;
+  _vertices[offset + 6]  = _u1;
+  _vertices[offset + 7]  = _v0;
+
+  // Vertex 2: Bottom-Right
+  _vertices[offset + 8]  = _x + _w;
+  _vertices[offset + 9]  = _y + _h;
+  _vertices[offset + 10] = _u1;
+  _vertices[offset + 11] = _v1;
+
+  // Vertex 3: Bottom-Left
+  _vertices[offset + 12] = _x;
+  _vertices[offset + 13] = _y + _h;
+  _vertices[offset + 14] = _u0;
+  _vertices[offset + 15] = _v1;
 }
 
 /**
