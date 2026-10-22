@@ -50,12 +50,17 @@ The engine (`core`, `render`, `world`) must not import from `game`.
 7. **Platformer feel.** Acceleration, variable jump height, coyote time, jump buffering.
 8. **Game.** Enemies, pickups, a couple of levels.
 
+## Decided
+
+- **Art:** basic geometry (coloured rectangles) only. The focus is on logic.
+- **Resolution:** low internal resolution, upscaled with crisp pixels. Modern/native scaling comes later with the fancy renderer.
+- **Input:** keyboard only in v1.
+- **Testing:** unit tests (Vitest) for pure logic such as the timestep and collision. Pure logic is kept free of browser APIs so it can be tested in Node.
+
 ## Open questions
 
-- Art: draw our own placeholder, or use a free CC0 tileset (e.g. Kenney)?
-- Pixel-perfect scaling: render at a low internal resolution and upscale, or render natively?
-- Gamepad support in v1, or keyboard only?
-- Testing: unit tests for pure logic (collision, timestep); screenshot checks for rendering?
+- Exact internal resolution (e.g. 320x180, 16:9) and tile size (e.g. 16 px).
+- Screenshot checks for rendering: worth it, or manual only?
 
 ## Who writes what
 
