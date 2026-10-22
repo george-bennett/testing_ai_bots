@@ -12,19 +12,19 @@ export class FixedTimestep {
     readonly maxFrameMs: number = 250,
   ) {}
 
-  /**
-   * Feed in how much real time passed since the last frame (ms).
-   * Returns how many simulation steps to run this frame.
-   */
-  advance(_frameMs: number): number {
-       if (stepMs > maxFrameMs)
-  }
+  private accumulator: number = 0
 
-  /**
-   * Fraction of a step left over after the last advance(), in [0, 1).
-   * The renderer uses it to interpolate between the previous and current state.
-   */
-  get alpha(): number {
-            return   this.accumulator / this.stepMs
+  advance(_frameMs: number): number {
+    const safeTime = Math.min(frameMs, this.maxFrameTime);
+    this.accumulator += safeTime;
+
+    const stepsToRun = Math.floor(this.accumulator / this.targetTimeStep);
+
+    this.accumulator -= stepsToRun * this.targetTimeStep;
+
+    return stepsToRun
+  }
+ public getAlpha(): number {
+    return this.accumulator / this.targetTimeStep;
   }
 }
