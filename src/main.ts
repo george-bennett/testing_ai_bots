@@ -1,5 +1,6 @@
 import { Loop } from "./core/Loop";
 import { createGL } from "./render/createGL";
+import { RectRenderer } from "./render/RectRenderer";
 
 const INTERNAL_WIDTH = 320;
 const INTERNAL_HEIGHT = 180;
@@ -7,6 +8,7 @@ const INTERNAL_HEIGHT = 180;
 const canvas = document.getElementById("game") as HTMLCanvasElement;
 const stats = document.getElementById("stats") as HTMLElement;
 const gl = createGL(canvas);
+const rects = new RectRenderer(gl, INTERNAL_WIDTH, INTERNAL_HEIGHT);
 
 // Upscale by a whole number so pixels stay crisp.
 function fitCanvas(): void {
@@ -17,9 +19,11 @@ function fitCanvas(): void {
 addEventListener("resize", fitCanvas);
 fitCanvas();
 
-// Simulation state: just a tick counter for now. Keep the previous value for interpolation.
-let tick = 0;
-let prevTick = 0;
+// Simulation state: a box sliding across the screen. Keep the previous x for interpolation.
+const BOX_SIZE = 24;
+const BOX_SPEED = 80; // pixels per second
+let boxX = 0;
+let prevBoxX = 0;
 
 // Counters for the on-screen readout.
 let frames = 0;
@@ -27,16 +31,25 @@ let steps = 0;
 let windowStart = performance.now();
 
 const loop = new Loop({
-  update() {
-    prevTick = tick;
-    tick++;
+  update(stepMs) {
+    prevBoxX = boxX;
+    boxX += (BOX_SPEED * stepMs) / 1000;
+    if (boxX > INTERNAL_WIDTH) boxX = -BOX_SIZE; // wrap around
+    // After a wrap, don't interpolate across the whole screen.
+    if (boxX < prevBoxX) prevBoxX = boxX;
     steps++;
   },
   render(alpha) {
-    // Blend between the last two simulation states.
-    const t = (prevTick + (tick - prevTick) * alpha) / 60; // seconds of simulated time
-    gl.clearColor(0.5 + 0.5 * Math.sin(t), 0.5 + 0.5 * Math.sin(t + 2.1), 0.5 + 0.5 * Math.sin(t + 4.2), 1);
+    gl.clearColor(0.08, 0.09, 0.12, 1);
     gl.clear(gl.COLOR_BUFFER_BIT);
+
+    // Corner markers verify the pixel -> clip space conversion (including the y flip).
+    rects.drawRect(0, 0, 16, 16, [1, 0.2, 0.2, 1]); // top-left: red
+    rects.drawRect(INTERNAL_WIDTH - 16, INTERNAL_HEIGHT - 16, 16, 16, [0.2, 0.6, 1, 1]); // bottom-right: blue
+
+    // The moving box, drawn between its last two simulated positions.
+    const x = prevBoxX + (boxX - prevBoxX) * alpha;
+    rects.drawRect(x, (INTERNAL_HEIGHT - BOX_SIZE) / 2, BOX_SIZE, BOX_SIZE, [1, 0.85, 0.2, 1]);
 
     frames++;
     const now = performance.now();
