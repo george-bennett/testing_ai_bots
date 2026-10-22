@@ -15,12 +15,12 @@ export class FixedTimestep {
   private accumulator: number = 0
 
   advance(_frameMs: number): number {
-    const safeTime = Math.min(frameMs, this.maxFrameTime);
+    const safeTime = Math.min(_frameMs, this.maxFrameMs);
     this.accumulator += safeTime;
 
-    const stepsToRun = Math.floor(this.accumulator / this.targetTimeStep);
+    const stepsToRun = Math.floor(this.accumulator / this.stepMs);
 
-    this.accumulator -= stepsToRun * this.targetTimeStep;
+    this.accumulator -= stepsToRun * this.stepMs;
 
     return stepsToRun
   }
