@@ -41,10 +41,10 @@ The engine (`core`, `render`, `world`) must not import from `game`.
 
 ## Milestones
 
-1. **Window + loop.** Canvas, WebGL2 context, fixed-timestep loop, clear to a colour.
-2. **Quad.** Shader + vertex buffer, draw one coloured rectangle.
-3. **Sprite.** Textures, draw an image, then a sprite batcher (many quads, one draw call).
-4. **Animation + camera.** Atlas frames, a camera that follows a target.
+1. **Window + loop.** Canvas, WebGL2 context, fixed-timestep loop, clear to a colour. *(done)*
+2. **Quad.** Shader + vertex buffer, draw one coloured rectangle. *(done)*
+3. **Sprite.** Textures, draw an image, then a sprite batcher (many quads, one draw call). *(done)*
+4. **Animation + camera.** Atlas frames, a camera that follows a target. *(camera done; animation next)*
 5. **Tilemap.** Load a Tiled map and draw it.
 6. **Collision.** Player AABB vs. tiles, resolved per axis.
 7. **Platformer feel.** Acceleration, variable jump height, coyote time, jump buffering.
@@ -56,6 +56,15 @@ The engine (`core`, `render`, `world`) must not import from `game`.
 - **Resolution:** low internal resolution, upscaled with crisp pixels. Modern/native scaling comes later with the fancy renderer.
 - **Input:** keyboard only in v1.
 - **Testing:** unit tests (Vitest) for pure logic such as the timestep and collision. Pure logic is kept free of browser APIs so it can be tested in Node.
+
+## Rendering conventions
+
+- Pixel coordinates, origin top-left, y down. The vertex shader converts to clip space.
+- World -> screen is `world - camera`, done in the vertex shader via a uniform.
+- The camera is rounded to whole pixels at render time only; simulation positions stay exact.
+- Quad vertex order is clockwise from the top-left; indices are `0,1,2,2,3,0` per quad.
+- Animation is driven by simulation steps, not real frame time.
+- A full sprite batch flushes (one extra draw call) rather than dropping or throwing.
 
 ## Open questions
 
