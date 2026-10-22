@@ -27,6 +27,9 @@ export class SpriteBatch {
   private readonly vertices: Float32Array;
   private readonly canvasSizeLocation: WebGLUniformLocation | null;
   private readonly textureLocation: WebGLUniformLocation | null;
+  private readonly cameraLocation: WebGLUniformLocation | null;
+  private cameraX = 0;
+  private cameraY = 0;
   private count = 0;
 
   constructor(
@@ -41,6 +44,7 @@ export class SpriteBatch {
     this.program = createProgram(gl, SPRITE_VERTEX_SHADER, SPRITE_FRAGMENT_SHADER);
     this.canvasSizeLocation = gl.getUniformLocation(this.program, "u_canvas_size");
     this.textureLocation = gl.getUniformLocation(this.program, "u_texture");
+    this.cameraLocation = gl.getUniformLocation(this.program, "u_camera");
     const positionLocation = gl.getAttribLocation(this.program, "a_pixel_position");
     const uvLocation = gl.getAttribLocation(this.program, "a_uv");
 
@@ -70,10 +74,17 @@ export class SpriteBatch {
     gl.bindVertexArray(null);
   }
 
+  /** Set the camera's world position (top-left of the view) for subsequent begin() calls. */
+  setCamera(x: number, y: number): void {
+    this.cameraX = x;
+    this.cameraY = y;
+  }
+
   begin(texture: WebGLTexture): void {
     const { gl } = this;
     gl.useProgram(this.program);
     gl.uniform2f(this.canvasSizeLocation, this.width, this.height);
+    gl.uniform2f(this.cameraLocation, this.cameraX, this.cameraY);
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.uniform1i(this.textureLocation, 0);

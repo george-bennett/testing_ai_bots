@@ -19,6 +19,9 @@ const pattern = createTexture(gl, TILE, TILE, makeTestPattern(TILE));
 // ?quads=N draws N extra small quads, to watch batching and flushing.
 const extraQuads = Number(new URLSearchParams(location.search).get("quads") ?? 0) || 0;
 
+// ?camx=N places the camera at world x = N (temporary, to see the camera uniform working).
+const cameraX = Number(new URLSearchParams(location.search).get("camx") ?? 0) || 0;
+
 // Upscale by a whole number so pixels stay crisp.
 function fitCanvas(): void {
   const scale = Math.max(1, Math.floor(Math.min(innerWidth / INTERNAL_WIDTH, innerHeight / INTERNAL_HEIGHT)));
@@ -59,6 +62,7 @@ const loop = new Loop({
     rects.drawRect(INTERNAL_WIDTH - 16, INTERNAL_HEIGHT - 16, 16, 16, [0.2, 0.6, 1, 1]); // bottom-right: blue
 
     batch.resetStats();
+    batch.setCamera(cameraX, 0);
     batch.begin(pattern);
 
     // Two rows of ground tiles along the bottom.

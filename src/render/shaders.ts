@@ -22,11 +22,13 @@ export const SPRITE_VERTEX_SHADER = `
 attribute vec2 a_pixel_position;
 attribute vec2 a_uv;
 uniform vec2 u_canvas_size;
+uniform vec2 u_camera; // the camera's world position (top-left of the view)
 varying vec2 v_uv;
 
 void main() {
-    // Same pixel -> clip space conversion as the rect shader.
-    vec2 zero_to_two = (a_pixel_position / u_canvas_size) * 2.0;
+    // World position -> screen position, then the same pixel -> clip space conversion as the rect shader.
+    vec2 screen_position = a_pixel_position - u_camera;
+    vec2 zero_to_two = (screen_position / u_canvas_size) * 2.0;
     vec2 clip_space = vec2(zero_to_two.x - 1.0, 1.0 - zero_to_two.y);
 
     gl_Position = vec4(clip_space, 0.0, 1.0);
