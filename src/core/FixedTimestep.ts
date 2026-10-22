@@ -24,7 +24,7 @@ export class FixedTimestep {
 
     return stepsToRun
   }
- public getAlpha(): number {
-    return this.accumulator / this.targetTimeStep;
-  }
+getAlpha(): number {
+return this.accumulator / this.stepMs;
+}
 }
