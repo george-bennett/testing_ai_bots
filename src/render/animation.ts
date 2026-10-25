@@ -45,7 +45,7 @@ export function atlasRegion(frame: number, columns: number, rows: number): Regio
  */
 export function frameAt(animation: Animation, elapsedSteps: number): number {
   const last = animation.frames[animation.frames.length - 1];
-  if (last === undefined) throw new Error("animation frame is missing");
+  if (last === undefined) throw new Error("Animation frame is undefined and has no frames in frameAt function");
 
   let total = 0;
   for (const entry of animation.frames) {
