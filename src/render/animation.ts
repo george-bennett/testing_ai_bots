@@ -44,6 +44,9 @@ export function atlasRegion(frame: number, columns: number, rows: number): Regio
  * and a non-looping one holds its last frame.
  */
 export function frameAt(animation: Animation, elapsedSteps: number): number {
+  const last = animation.frames[animation.frames.length - 1];
+  if (last === undefined) throw new Error("Animation loop not defined, defaulting to base animation");
+
   let total = 0;
   for (const entry of animation.frames) {
     total += entry.steps;
@@ -54,5 +57,5 @@ export function frameAt(animation: Animation, elapsedSteps: number): number {
     if (remaining < entry.steps) return entry.frame;
     remaining -= entry.steps;
   }
-  return animation.frames[animation.frames.length - 1].frame;   // ran past the end (only possible when not looping): hold the last frame
+  return animation.frames;   // ran past the end (only possible when not looping): hold the last frame
 }
