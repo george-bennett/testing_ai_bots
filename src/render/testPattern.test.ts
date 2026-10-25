@@ -1,5 +1,42 @@
 import { describe, expect, it } from "vitest";
-import { makeTestPattern } from "./testPattern";
+import { makeAtlasPattern, makeTestPattern } from "./testPattern";
+
+describe("makeAtlasPattern", () => {
+  const cells = 4;
+  const size = 16;
+  const data = makeAtlasPattern(cells, size);
+  const width = cells * size;
+  const at = (cell: number, x: number, y: number) => {
+    const i = (y * width + cell * size + x) * 4;
+    return Array.from(data.slice(i, i + 4));
+  };
+
+  it("has RGBA data for a (cells * size) x size texture", () => {
+    expect(data.length).toBe(width * size * 4);
+  });
+
+  it("puts the coloured block in a different corner of each cell, clockwise from top-left", () => {
+    const centres = [
+      [5, 5], // cell 0: top-left
+      [10, 5], // cell 1: top-right
+      [10, 10], // cell 2: bottom-right
+      [5, 10], // cell 3: bottom-left
+    ] as const;
+    const colours = centres.map(([x, y], cell) => at(cell, x, y).join());
+    expect(new Set(colours).size).toBe(4); // four different colours
+
+    // and each corner is empty (background) in the other three cells
+    centres.forEach(([x, y], owner) => {
+      for (let cell = 0; cell < cells; cell++) {
+        if (cell !== owner) expect(at(cell, x, y)).not.toEqual(at(owner, x, y));
+      }
+    });
+  });
+
+  it("is fully opaque", () => {
+    for (let i = 3; i < data.length; i += 4) expect(data[i]).toBe(255);
+  });
+});
 
 function pixel(data: Uint8Array, size: number, x: number, y: number): number[] {
   const i = (y * size + x) * 4;

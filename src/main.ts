@@ -1,10 +1,11 @@
 import { Loop } from "./core/Loop";
+import { type Animation, atlasRegion, frameAt } from "./render/animation";
 import { cameraFor } from "./render/camera";
 import { createGL } from "./render/createGL";
 import { RectRenderer } from "./render/RectRenderer";
 import { SpriteBatch } from "./render/SpriteBatch";
 import { createTexture } from "./render/texture";
-import { makeTestPattern } from "./render/testPattern";
+import { makeAtlasPattern, makeTestPattern } from "./render/testPattern";
 
 const INTERNAL_WIDTH = 320;
 const INTERNAL_HEIGHT = 180;
@@ -18,6 +19,21 @@ const gl = createGL(canvas);
 const rects = new RectRenderer(gl, INTERNAL_WIDTH, INTERNAL_HEIGHT);
 const batch = new SpriteBatch(gl, INTERNAL_WIDTH, INTERNAL_HEIGHT);
 const pattern = createTexture(gl, TILE, TILE, makeTestPattern(TILE));
+
+// Animation atlas: a strip of 4 cells, each TILE x TILE.
+const ATLAS_CELLS = 4;
+const atlas = createTexture(gl, ATLAS_CELLS * TILE, TILE, makeAtlasPattern(ATLAS_CELLS, TILE));
+
+// Frame 0 is held longer than the others (12 steps vs 8), to show per-frame timing.
+const walk: Animation = {
+  loop: true,
+  frames: [
+    { frame: 0, steps: 12 },
+    { frame: 1, steps: 8 },
+    { frame: 2, steps: 8 },
+    { frame: 3, steps: 8 },
+  ],
+};
 
 // ?quads=N draws N extra small quads, to watch batching and flushing.
 const extraQuads = Number(new URLSearchParams(location.search).get("quads") ?? 0) || 0;
@@ -37,6 +53,7 @@ const BOX_Y = 40;
 const BOX_SPEED = 80; // pixels per second
 let boxX = 0;
 let prevBoxX = 0;
+let animSteps = 0; // simulation steps elapsed, which drives the animation
 
 // Counters for the on-screen readout.
 let frames = 0;
@@ -55,6 +72,7 @@ const loop = new Loop({
     if (boxX > WORLD_WIDTH) boxX = -BOX_SIZE; // wrap around
     // After a wrap, don't interpolate across the whole world.
     if (boxX < prevBoxX) prevBoxX = boxX;
+    animSteps++;
     steps++;
   },
   render(alpha) {
@@ -89,8 +107,13 @@ const loop = new Loop({
       batch.draw(sx, sy, 4, 4);
     }
 
-    batch.draw(x, BOX_Y, BOX_SIZE, BOX_SIZE);
+    batch.end();
 
+    // The box uses a different texture (the atlas), so it gets its own batch: a texture change means a new draw call.
+    const frame = frameAt(walk, animSteps);
+    const region = atlasRegion(frame, ATLAS_CELLS, 1);
+    batch.begin(atlas);
+    batch.draw(x, BOX_Y, BOX_SIZE, BOX_SIZE, region.u0, region.v0, region.u1, region.v1);
     batch.end();
     lastQuads = batch.stats.quads;
     lastDrawCalls = batch.stats.drawCalls;
@@ -102,7 +125,7 @@ const loop = new Loop({
       stats.textContent =
         `frames/s ${(frames / seconds).toFixed(0)}   steps/s ${(steps / seconds).toFixed(0)}\n` +
         `quads ${lastQuads}   draw calls ${lastDrawCalls}\n` +
-        `box x ${boxX.toFixed(0)}   camera x ${Math.round(camera.x)}`;
+        `box x ${boxX.toFixed(0)}   camera x ${Math.round(camera.x)}   anim frame ${frame}`;
       frames = 0;
       steps = 0;
       windowStart = now;
