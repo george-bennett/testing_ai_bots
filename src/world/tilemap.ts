@@ -23,5 +23,5 @@ export function getTileCoordinate(pixelX: number, pixelY: number, tileSize: numb
  * Row 0 occupies positions 0 .. columns-1, row 1 starts right after it, and so on.
  */
 export function tileIndex(column: number, row: number, columns: number): number {
-  return (row*column) + columns
+  return (row*columns) + column
 }
