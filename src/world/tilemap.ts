@@ -22,6 +22,6 @@ export function getTileCoordinate(pixelX: number, pixelY: number, tileSize: numb
  * Position in the flat tile list of the tile at (column, row), for a map `columns` tiles wide.
  * Row 0 occupies positions 0 .. columns-1, row 1 starts right after it, and so on.
  */
-export function tileIndex(_column: number, _row: number, _columns: number): number {
-  throw new Error("TODO: implement tileIndex");
+export function tileIndex(column: number, row: number, columns: number): number {
+  return (row*column) + column
 }
