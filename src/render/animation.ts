@@ -45,13 +45,13 @@ export function atlasRegion(frame: number, columns: number, rows: number): Regio
  */
 export function frameAt(animation: Animation, elapsedSteps: number): number {
   let total = 0;
+  let remaining = animation.loop ? (elapsedSteps % total) : elapsedSteps;   // loop: wrap into one cycle
 
 for (const entry of animation.frames) {
     if (remaining < entry.steps) return entry.frame;
     remaining -= entry.steps;
     total+=remaining
 }
-  let remaining = animation.loop ? (elapsedSteps % total) : elapsedSteps;   // loop: wrap into one cycle
   for (const entry of animation.frames) {
     if (remaining < entry.steps) return entry.frame;
     remaining -= entry.steps;
