@@ -44,7 +44,13 @@ export function atlasRegion(frame: number, columns: number, rows: number): Regio
  * and a non-looping one holds its last frame.
  */
 export function frameAt(animation: Animation, elapsedSteps: number): number {
-  const total = 0;   // the sum of every frame's steps (12 in the example)
+  let total = 0;
+
+for (const entry of animation.frames) {
+    if (remaining < entry.steps) return entry.frame;
+    remaining -= entry.steps;
+    total+=remaining
+}
   let remaining = animation.loop ? (elapsedSteps % total) : elapsedSteps;   // loop: wrap into one cycle
   for (const entry of animation.frames) {
     if (remaining < entry.steps) return entry.frame;
