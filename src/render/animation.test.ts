@@ -51,6 +51,11 @@ describe("frameAt", () => {
     expect(frameAt(once, 1000)).toBe(9);
   });
 
+  it("throws on an animation with no frames, whether or not it loops", () => {
+    expect(() => frameAt({ loop: true, frames: [] }, 0)).toThrow();
+    expect(() => frameAt({ loop: false, frames: [] }, 0)).toThrow();
+  });
+
   it("works for a single-frame animation", () => {
     const still: Animation = { loop: true, frames: [{ frame: 3, steps: 10 }] };
     expect(frameAt(still, 0)).toBe(3);
